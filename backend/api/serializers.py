@@ -6,6 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'password',]
+        read_only_fields = ['id']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -17,7 +18,7 @@ class NoteSerializer(serializers.ModelSerializer):
         model = Note
         fields = ['id', 'title', 'content', 'created_at', 'author']
         read_only_fields = ['created_at', 'author']
-        extra_kwargs = {'author': {'read_only': False}}
+        extra_kwargs = {'author': {'read_only': True}}
         
     # def create(self, validated_data):
     #     request = self.context.get('request')

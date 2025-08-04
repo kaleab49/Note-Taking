@@ -3,18 +3,19 @@ import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import "../styles/Form.css"
-import LoadingIndicator from "./LoadingIndicator";
 
 function Form({ route, method }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const name = method === "login" ? "Login" : "Register";
 
     const handleSubmit = async (e) => {
         setLoading(true);
+        setError("");
         e.preventDefault();
 
         try {
@@ -27,7 +28,14 @@ function Form({ route, method }) {
                 navigate("/login")
             }
         } catch (error) {
-            alert(error)
+            console.error("Authentication error:", error);
+            if (error.response) {
+                setError(error.response.data?.detail || error.response.data?.message || "Authentication failed");
+            } else if (error.request) {
+                setError("Network error - please check your connection");
+            } else {
+                setError("An unexpected error occurred");
+            }
         } finally {
             setLoading(false)
         }
@@ -36,12 +44,14 @@ function Form({ route, method }) {
     return (
         <form onSubmit={handleSubmit} className="form-container">
             <h1>{name}</h1>
+            {error && <div className="error-message">{error}</div>}
             <input
                 className="form-input"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Username"
+                required
             />
             <input
                 className="form-input"
@@ -49,10 +59,10 @@ function Form({ route, method }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
+                required
             />
-            {loading && <LoadingIndicator />}
-            <button className="form-button" type="submit">
-                {name}
+            <button className="form-button" type="submit" disabled={loading}>
+                {loading ? "Loading..." : name}
             </button>
         </form>
     );

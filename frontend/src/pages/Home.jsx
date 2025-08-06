@@ -13,11 +13,7 @@ function Home() {
   const getNotes = () => {
     api
       .get("/api/notes/")
-      .then((res) => res.data)
-      .then((data) => {
-        setNotes(data);
-        console.log(data);
-      })
+      .then((res) => setNotes(res.data))
       .catch((err) => alert(err));
   };
 
@@ -42,6 +38,8 @@ function Home() {
       .then((res) => {
         if (res.status === 201) {
           alert("Note created");
+          setContent("");
+          setTitle("");
           getNotes();
         } else {
           alert("Failed to make note");
@@ -55,11 +53,34 @@ function Home() {
       <div>
         <h2>Notes</h2>
       </div>
+      <div className="notes-list">
+        {notes.length === 0 ? (
+          <div className="empty-state">
+            No notes yet. Create your first note!
+          </div>
+        ) : (
+          notes.map((note) => (
+            <div className="note-item" key={note.id}>
+              <div className="note-title">{note.title}</div>
+              <div className="note-content">{note.content}</div>
+              <div className="note-actions">
+                <button
+                  className="delete-btn"
+                  onClick={() => deleteNote(note.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
       <h2>Create Note</h2>
-      <form onSubmit={createNote}>
+      <form className="form-container" onSubmit={createNote}>
         <label htmlFor="title">Title:</label>
         <br />
         <input
+          className="form-input"
           type="text"
           name="title"
           id="title"
@@ -68,10 +89,10 @@ function Home() {
           value={title}
         />
         <br />
-
         <label htmlFor="content">Content:</label>
         <br />
         <textarea
+          className="form-input"
           name="content"
           id="content"
           placeholder="Your content here..."
@@ -79,7 +100,7 @@ function Home() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         ></textarea>
-        <input type="submit" value="Submit"></input>
+        <input className="form-button" type="submit" value="Submit" />
       </form>
     </div>
   );
